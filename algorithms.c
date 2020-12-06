@@ -86,7 +86,82 @@ int LRU(int *str)
 
 // runs Optimal Algorithm on array of integers
 // returns number of page faults
+
+
 int Optimal(int *str)
+{
+  // total number of page faults in reference string
+    int count_faults = 0;
+
+    // flag used to determin if page was found in page-frames. 1 = page fault.
+    int fault = 1;
+
+    // arrays to store frames
+    int frame[4] = {-1, -1, -1, -1};
+
+    // Start iterating through the reference string
+    for(int i = 0; i < PAGEREF_MAX; ++i) {
+      if (str[i] == -1) {
+        break;
+      }
+
+      for(int j = 0; j < 4; ++j) {
+
+        // fill empty frames first
+        if (frame[j] == -1){
+          frame[j] = str[i];
+          count_faults++;
+          break;
+        }
+
+        // frame found, do nothing
+        if (frame[j] == str[i]) {
+          break;
+        }
+
+        // page fault, this is where the fun starts
+        if (j == 3){
+
+          // will track how many pages on the frame are coming up soon
+          int found = 0;
+          int pageFound[4] = {0, 0, 0, 0};
+
+          for (int k=j ; k < PAGEREF_MAX ; ++k){ // read from next page until the end
+
+            if (found == 3) // if we get here, that means the previous loop was broken. Break out of this double loop
+              break;
+
+            // if the page exists in the frame, show that the frame will appear soon
+            for (int p=0 ; p<3 ; ++p){
+              if (frame[p] == str[k] && pageFound[p] != 1){
+                pageFound[p] = 1;
+                found++;
+              }
+            }
+            //
+
+            // if there is only 1 unfound page in memory, that one must be replaced
+            if (found == 3){
+              for (int p=0 ; p<3 ; ++p){
+                if (pageFound[p] == 0){
+                  frame[p] = str[i];
+                  break;
+                }
+              }
+            }
+            //
+          }
+          count_faults++;
+        }
+      }
+    }
+    return count_faults;
+}
+
+
+
+// No longer used
+int OptimalOld(int *str)
 {
 // total number of page faults in reference string
   int count_faults = 0;

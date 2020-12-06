@@ -20,6 +20,8 @@ int LRU(int *str);
 // returns number of page faults
 int Optimal(int *str);
 
+int Optimal2(int *str);
+
 
 
 // Globals
@@ -57,7 +59,7 @@ int main(int argc, char *argv[]) {
   printf("%d Faults detected with LRU\n", LRU(pageRef));
   printf("%d Faults detected with Optimal\n", Optimal(pageRef));
 
-  
+
 }
 
 void parseInput(int *pageRefs, char *input)
