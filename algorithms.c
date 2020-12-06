@@ -45,48 +45,40 @@ int LRU(int *str)
   // number of page faults in reference string
   int count_faults = 0;
 
+  // initialize loop
   int fault = 1;
   int frame[4] = {-1, -1, -1, -1};
+
+  // check each page ref
   for (int i=0 ; i < PAGEREF_MAX ; ++i){ // for each number in ref string
     if (str[i] == -1)
       break;
-    // // fill in first 4 frames
-    // if (i < 4){
-    //   frame[i] = str[i];
-    //   count_faults++;
-    //   continue;
-    // }
 
-    // check if page ref is in main memory
+
+    // check if page ref is in any frame
     for(int j = 0; j < 4; ++j) {
-      if (frame[j] == str[i]) { // if so, move page to front and move the rest down
+
+      // page found on frame, move page to front
+      if (frame[j] == str[i]){
         int temp = frame[j];
-        for (int k=j ; k > 0 ; --k){
+        for (int k=j ; k > 0 ; k--){
           frame[k] = frame[k-1];
         }
         frame[0] = temp;
-        fault = 0;
-      } else if (frame[j] == -1){ // fill in blank frames
-        frame[j] = str[i];
-        fault = 0;
-        count_faults++;
-      }
-    }
+        break;
 
-    // if the page is not in the page-frames, we have a fault
-    // then replace the first page and move the rest down
-    if (fault) {
-        for (int k=3 ; k > 0 ; --k){
+        // page fault, place in front and move rest down
+      } else if (j == 3 || frame[j] == -1){
+        for (int k=j ; k > 0 ; k--){
           frame[k] = frame[k-1];
         }
+
         frame[0] = str[i];
-      count_faults++;
-    }
-    else {
-      fault = 1;
+        count_faults++;
+        break;
+      }
     }
   }
-
   return count_faults;
 }
 
