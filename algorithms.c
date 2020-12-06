@@ -61,7 +61,7 @@ int LRU(int *str)
       // page found on frame, move page to front
       if (frame[j] == str[i]){
         int temp = frame[j];
-        for (int k=j ; k > 0 ; k--){
+        for (int k=j ; k > 0 ; --k){
           frame[k] = frame[k-1];
         }
         frame[0] = temp;
@@ -69,7 +69,7 @@ int LRU(int *str)
 
         // page fault, place in front and move rest down
       } else if (j == 3 || frame[j] == -1){
-        for (int k=j ; k > 0 ; k--){
+        for (int k=j ; k > 0 ; --k){
           frame[k] = frame[k-1];
         }
 
