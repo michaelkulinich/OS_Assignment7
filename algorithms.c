@@ -7,9 +7,12 @@ int FIFO(int *str)
   // total number of page faults in reference string
   int count_faults = 0;
 
+  // current first frame added
+  int firstFrame = 0;
+
   // flag used to determin if page was found in page-frames. 1 = page fault.
   int fault = 1;
-  int frame[4];
+  int frame[4] = {-1, -1, -1, -1};
   for(int i=0; i < PAGEREF_MAX ; ++i) {
     if (str[i] == -1)
       break;
@@ -22,8 +25,8 @@ int FIFO(int *str)
     // if the page is not in the page-frames, we have a fault
     // then replace the oldest page in the page-frames
     if (fault) {
-      frame[i % 4] = str[i];  // circular array
-      count_faults++;  
+      frame[firstFrame++ % 4] = str[i];  // circular array
+      count_faults++;
     }
     else {
       fault = 1;
@@ -43,30 +46,33 @@ int LRU(int *str)
   int count_faults = 0;
 
   int fault = 1;
-  int frame[4];
+  int frame[4] = {-1, -1, -1, -1};
   for (int i=0 ; i < PAGEREF_MAX ; ++i){ // for each number in ref string
     if (str[i] == -1)
       break;
-    // fill in first 4 frames
-    if (i < 4){
-      frame[i] = str[i];
-      count_faults++;
-      continue;
-    }
+    // // fill in first 4 frames
+    // if (i < 4){
+    //   frame[i] = str[i];
+    //   count_faults++;
+    //   continue;
+    // }
 
     // check if page ref is in main memory
     for(int j = 0; j < 4; ++j) {
-      if (frame[j] == str[i]) {
-        // if so, move page to front and move the rest down
+      if (frame[j] == str[i]) { // if so, move page to front and move the rest down
         int temp = frame[j];
         for (int k=j ; k > 0 ; --k){
           frame[k] = frame[k-1];
         }
         frame[0] = temp;
         fault = 0;
+      } else if (frame[j] == -1){ // fill in blank frames
+        frame[j] = str[i];
+        fault = 0;
+        count_faults++;
       }
     }
-    
+
     // if the page is not in the page-frames, we have a fault
     // then replace the first page and move the rest down
     if (fault) {
@@ -146,16 +152,16 @@ int Optimal(int *str)
           }
 
           // if the frame page is used later in the reference string
-          else if (frame[m] == str[k]) { 
+          else if (frame[m] == str[k]) {
             int dontFillTemp = 0;
             for (int j = 0; j < frameSize; ++j) {
 
-              // if the frame is already in the temp array, 
-              if (temp[j] == m) { 
+              // if the frame is already in the temp array,
+              if (temp[j] == m) {
                 dontFillTemp = 1;
               }
             }
-            if (!dontFillTemp){ 
+            if (!dontFillTemp){
               temp[indexTemp] = m;
               indexTemp++;
             }
@@ -201,7 +207,7 @@ int Optimal(int *str)
 
             // the frame at index j is NOT used agian later on in the reference string
             // so we fill that spot up with the new page
-            if(!boolArrayFrame[j]) {  
+            if(!boolArrayFrame[j]) {
               frame[j] = str[i];
               allUsedAgainLater = 0;
               break;
@@ -214,7 +220,7 @@ int Optimal(int *str)
           }
         }
       }
-      count_faults++;  
+      count_faults++;
     }
     else {
       fault = 1;

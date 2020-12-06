@@ -1,2 +1,2 @@
 main:
-  gcc main.c -o vmmpr
+	gcc main.c -o vmmpr
